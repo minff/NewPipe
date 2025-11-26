@@ -28,11 +28,28 @@ abstract class BasePlayerGestureListener(
     private var isSpeedHeld = false
     private var previousPlaybackSpeed = 1.0f
 
+    private val holdDelayMs = 300L // Delay before triggering hold-to-speed
+    private val holdHandler = Handler(Looper.getMainLooper())
+    private val holdRunnable = Runnable {
+        if (!isSpeedHeld && player.currentState == Player.STATE_PLAYING) {
+            previousPlaybackSpeed = player.getPlaybackSpeed()
+            player.setPlaybackSpeed(2.0f)
+            isSpeedHeld = true
+            binding.playbackSpeed?.text = org.schabi.newpipe.player.helper.PlayerHelper.formatSpeed(player.getPlaybackSpeed())
+        }
+    }
+
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         playerUi.gestureDetector.onTouchEvent(event)
 
         when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                // Start hold delay timer
+                holdHandler.postDelayed(holdRunnable, holdDelayMs)
+            }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                // Cancel hold delay and reset speed if necessary
+                holdHandler.removeCallbacks(holdRunnable)
                 resetHoldToSpeed()
             }
         }
