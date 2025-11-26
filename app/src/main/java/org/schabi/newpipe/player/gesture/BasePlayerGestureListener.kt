@@ -27,51 +27,32 @@ abstract class BasePlayerGestureListener(
     // hold-to-speed state
     private var isSpeedHeld = false
     private var previousPlaybackSpeed = 1.0f
-    private val holdDelayMs = 300L // adjust to taste
 
-    private val holdHandler = Handler(Looper.getMainLooper())
-    private var holdRunnable: Runnable? = null
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         playerUi.gestureDetector.onTouchEvent(event)
 
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                // Cancel any previous runnable
-                holdRunnable?.let { holdHandler.removeCallbacks(it) }
-
-                // Only schedule when single pointer (avoid two-finger gestures)
-                if (event.pointerCount == 1) {
-                    holdRunnable = Runnable {
-                        // only switch if playing and not already switched
-                        if (!isSpeedHeld && player.currentState == Player.STATE_PLAYING) {
-                            previousPlaybackSpeed = player.getPlaybackSpeed()
-                            player.setPlaybackSpeed(2.0f)
-                            isSpeedHeld = true
-                            // update UI speed label immediately
-                            binding.playbackSpeed?.text = org.schabi.newpipe.player.helper.PlayerHelper.formatSpeed(player.getPlaybackSpeed())
-                        }
-                    }
-                    holdHandler.postDelayed(holdRunnable!!, holdDelayMs)
-                }
-            }
-
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 resetHoldToSpeed()
             }
         }
 
         // keep previous return behavior so gesture flow isn't broken
-        
         return false
     }
 
-    private fun resetHoldToSpeed() {
-        // Cancel scheduled hold-to-speed if not yet executed
-        holdRunnable?.let {
-            holdHandler.removeCallbacks(it)
-            holdRunnable = null
+    override fun onLongPress(e: MotionEvent) {
+        // Only trigger when single pointer (avoid two-finger gestures)
+        if (e.pointerCount == 1 && !isSpeedHeld && player.currentState == Player.STATE_PLAYING) {
+            previousPlaybackSpeed = player.getPlaybackSpeed()
+            player.setPlaybackSpeed(2.0f)
+            isSpeedHeld = true
+            // Update UI speed label immediately
+            binding.playbackSpeed?.text = org.schabi.newpipe.player.helper.PlayerHelper.formatSpeed(player.getPlaybackSpeed())
         }
+    }
 
+    private fun resetHoldToSpeed() {
         // If hold-to-speed was active, restore previous speed
         if (isSpeedHeld) {
             player.setPlaybackSpeed(previousPlaybackSpeed)
