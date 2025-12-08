@@ -20,6 +20,7 @@ on:
     branches:
       - dev
       - master
+      - speed2x
     paths-ignore:
       - 'README.md'
       - 'doc/**'
