@@ -46,10 +46,10 @@ abstract class BasePlayerGestureListener(
         // Only trigger when single pointer (avoid two-finger gestures)
         if (e.pointerCount == 1 && !isSpeedHeld && player.currentState == Player.STATE_PLAYING) {
             previousPlaybackSpeed = player.getPlaybackSpeed()
-            player.setPlaybackSpeed(2.0f)
+            player.setPlaybackSpeed(PLAYBACK_SPEED_HELD)
             isSpeedHeld = true
             // Update UI speed label immediately
-            binding.playbackSpeed?.text = formatSpeed(player.getPlaybackSpeed().toDouble())
+            binding.playbackSpeed.setText(formatSpeed(PLAYBACK_SPEED_HELD.toDouble()))
         }
     }
 
@@ -58,7 +58,7 @@ abstract class BasePlayerGestureListener(
         if (isSpeedHeld) {
             player.setPlaybackSpeed(previousPlaybackSpeed)
             isSpeedHeld = false
-            binding.playbackSpeed?.text = formatSpeed(previousPlaybackSpeed.toDouble())
+            binding.playbackSpeed.setText(formatSpeed(previousPlaybackSpeed.toDouble()))
         }
     }
 
@@ -228,5 +228,7 @@ abstract class BasePlayerGestureListener(
 
         private const val DOUBLE_TAP = "doubleTap"
         private const val DOUBLE_TAP_DELAY = 550L
+
+        private const val PLAYBACK_SPEED_HELD = 2.0f
     }
 }
