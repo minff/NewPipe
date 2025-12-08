@@ -9,6 +9,7 @@ import android.view.View
 import androidx.core.os.postDelayed
 import org.schabi.newpipe.databinding.PlayerBinding
 import org.schabi.newpipe.player.Player
+import org.schabi.newpipe.player.helper.PlayerHelper.formatSpeed
 import org.schabi.newpipe.player.ui.VideoPlayerUi
 
 /**
@@ -48,7 +49,7 @@ abstract class BasePlayerGestureListener(
             player.setPlaybackSpeed(2.0f)
             isSpeedHeld = true
             // Update UI speed label immediately
-            binding.playbackSpeed?.text = org.schabi.newpipe.player.helper.PlayerHelper.formatSpeed(player.getPlaybackSpeed())
+            binding.playbackSpeed?.text = formatSpeed(player.getPlaybackSpeed().toDouble())
         }
     }
 
@@ -57,7 +58,7 @@ abstract class BasePlayerGestureListener(
         if (isSpeedHeld) {
             player.setPlaybackSpeed(previousPlaybackSpeed)
             isSpeedHeld = false
-            binding.playbackSpeed?.text = org.schabi.newpipe.player.helper.PlayerHelper.formatSpeed(previousPlaybackSpeed)
+            binding.playbackSpeed?.text = formatSpeed(previousPlaybackSpeed.toDouble())
         }
     }
 
