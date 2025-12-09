@@ -49,7 +49,7 @@ abstract class BasePlayerGestureListener(
             player.setPlaybackSpeed(PLAYBACK_SPEED_HELD)
             isSpeedHeld = true
             // Update UI speed label immediately
-            binding.playbackSpeed.setText(formatSpeed(PLAYBACK_SPEED_HELD.toDouble()))
+            showPlaybackSpeedOverlay(PLAYBACK_SPEED_HELD)
         }
     }
 
@@ -58,8 +58,18 @@ abstract class BasePlayerGestureListener(
         if (isSpeedHeld) {
             player.setPlaybackSpeed(previousPlaybackSpeed)
             isSpeedHeld = false
-            binding.playbackSpeed.setText(formatSpeed(previousPlaybackSpeed.toDouble()))
+            showPlaybackSpeedOverlay(previousPlaybackSpeed)
         }
+    }
+
+    private fun showPlaybackSpeedOverlay(speed: Float) {
+        binding.playbackSpeed.setText(formatSpeed(speed.toDouble()))
+        // show overlay
+        val overlay = binding.playbackSpeedOverlay // Ensure this matches the ID in your layout
+        overlay.setText(formatSpeed(speed.toDouble()))
+        overlay.setVisibility(View.VISIBLE)
+        // Hide the overlay after a delay
+        overlay.postDelayed(2000) { overlay.setVisibility(View.GONE) }
     }
 
     private fun onDoubleTap(
